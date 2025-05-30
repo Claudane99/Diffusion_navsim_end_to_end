@@ -1,0 +1,6 @@
+export NUPLAN_MAP_VERSION="nuplan-maps-v1.0"
+export NUPLAN_MAPS_ROOT="/home/claudane/Desktop/navsim/dataset/maps"
+export NAVSIM_EXP_ROOT="/home/claudane/Desktop/navsim/exp"
+export NAVSIM_DEVKIT_ROOT="/home/claudane/Desktop/navsim/"
+export OPENSCENE_DATA_ROOT="/home/claudane/Desktop/navsim/dataset"
+export PYTHONPATH="/home/claudane/Desktop/navsim:$PYTHONPATH"

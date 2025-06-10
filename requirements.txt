@@ -15,7 +15,7 @@ hydra-core==1.2.0  # Used for configs
 joblib
 matplotlib  # Used for rendering
 nest_asyncio  # Used to nest event loops when running nuBoard/jupyter
-numpy==1.23.4
+numpy==1.23.4 # Must use below than numpy 2.0 (as not compatible with resize
 opencv-python==4.9.0.80  # Used widely
 pandas    # Used widely
 Pillow    # Used widely to render images

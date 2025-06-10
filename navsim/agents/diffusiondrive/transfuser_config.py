@@ -11,12 +11,12 @@ from nuplan.planning.simulation.trajectory.trajectory_sampling import Trajectory
 class TransfuserConfig:
     """Global TransFuser config."""
 
-    trajectory_sampling: TrajectorySampling = TrajectorySampling(time_horizon=4, interval_length=0.5)
+    trajectory_sampling: TrajectorySampling = TrajectorySampling(time_horizon=1, interval_length=0.5)
 
     image_architecture: str = "resnet34"
     lidar_architecture: str = "resnet34"
-    bkb_path: str = "/home/claudane/Desktop/navsim/exp/resnet34.a1_in1k/pytorch_model.bin"
-    plan_anchor_path: str = "/home/claudane/Desktop/navsim/exp/kmeans_navsim_traj_20.npy"
+    bkb_path: str = "/home/junn2004/Desktop/XianCheng/Diffusion_navsim_end_to_end/exp/pytorch_model.bin"
+    plan_anchor_path: str = "/home/junn2004/Desktop/XianCheng/Diffusion_navsim_end_to_end/exp/kmeans_navsim_traj_20.npy"
 
     latent: bool = False
     latent_rad_thresh: float = 4 * np.pi / 9

@@ -1,6 +1,21 @@
 export NUPLAN_MAP_VERSION="nuplan-maps-v1.0"
-export NUPLAN_MAPS_ROOT="/home/claudane/Desktop/navsim/dataset/maps"
-export NAVSIM_EXP_ROOT="/home/claudane/Desktop/navsim/exp"
-export NAVSIM_DEVKIT_ROOT="/home/claudane/Desktop/navsim/"
-export OPENSCENE_DATA_ROOT="/home/claudane/Desktop/navsim/dataset"
-export PYTHONPATH="/home/claudane/Desktop/navsim:$PYTHONPATH"
+export NUPLAN_MAPS_ROOT="/home/junn2004/Desktop/XianCheng/Diffusion_navsim_end_to_end/dataset/maps"
+export NAVSIM_EXP_ROOT="/home/junn2004/Desktop/XianCheng/Diffusion_navsim_end_to_end/exp"
+export NAVSIM_DEVKIT_ROOT="/home/junn2004/Desktop/XianCheng/Diffusion_navsim_end_to_end/"
+export OPENSCENE_DATA_ROOT="/home/junn2004/Desktop/XianCheng/Diffusion_navsim_end_to_end/dataset"
+export PYTHONPATH="/home/junn2004/Desktop/XianCheng/Diffusion_navsim_end_to_end:$PYTHONPATH"
+
+
+# Bug that meet during running
+1. target["trajectory"] is None
+-> 
+
+2. TypeError: stat: path should be string, bytes, os.PathLike or integer, not NoneType (during scene_loader)
+-> Restart the terminal and make sure the NUPLAN_MAPS_ROOT is predefined like this
+os.environ["NAVSIM_EXP_ROOT"] ="/home/claudane/Desktop/navsim/exp"
+os.environ["NAVSIM_DEVKIT_ROOT"] ="/home/claudane/Desktop/navsim/"
+os.environ["OPENSCENE_DATA_ROOT"] ="/home/claudane/Desktop/navsim/dataset"
+os.environ["NUPLAN_MAPS_ROOT"] = "/home/claudane/Desktop/navsim/dataset/maps"
+os.environ["CACHEDATA"] = str("/home/claudane/Desktop/navsim/exp/training_cache")
+OPENSCENE_DATA_ROOT = os.environ.get("OPENSCENE_DATA_ROOT")
+NUPLAN_MAPS_ROOT = os.environ.get("NUPLAN_MAPS_ROOT")

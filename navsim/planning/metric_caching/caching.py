@@ -89,7 +89,7 @@ def cache_scenarios(args: List[Dict[str, Union[List[str], DictConfig]]]) -> List
 
         processor = MetricCacheProcessor(
             cache_path=cfg.metric_cache_path,
-            force_feature_computation=cfg.force_feature_computation,
+            force_feature_computation=cfg.cache.force_feature_computation,
             proposal_sampling=instantiate(cfg.proposal_sampling),
         )
 

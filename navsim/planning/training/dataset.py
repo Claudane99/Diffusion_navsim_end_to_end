@@ -64,6 +64,7 @@ class CacheOnlyDataset(torch.utils.data.Dataset):
         )
         self.tokens = list(self._valid_cache_paths.keys())
 
+
     def __len__(self) -> int:
         """
         :return: number of samples to load
@@ -78,6 +79,7 @@ class CacheOnlyDataset(torch.utils.data.Dataset):
         """
         return self._load_scene_with_token(self.tokens[idx])
 
+            
     @staticmethod
     def _load_valid_caches(
         cache_path: Path,
@@ -116,18 +118,57 @@ class CacheOnlyDataset(torch.utils.data.Dataset):
         """
 
         token_path = self._valid_cache_paths[token]
+        # print(token_path)
+        # current_index = self.tokens.index[token]
+        # print(current_index)
 
         features: Dict[str, torch.Tensor] = {}
         for builder in self._feature_builders:
             data_dict_path = token_path / (builder.get_unique_name() + ".gz")
+            # print(data_dict_path)
             data_dict = load_feature_target_from_pickle(data_dict_path)
             features.update(data_dict)
+
+            # if features is None:
+            #     print("features is None at this point in training_step")
+            # else:
+            #     print(f"features keys: {list(features.keys())}")
 
         targets: Dict[str, torch.Tensor] = {}
         for builder in self._target_builders:
             data_dict_path = token_path / (builder.get_unique_name() + ".gz")
+            # print(data_dict_path)
             data_dict = load_feature_target_from_pickle(data_dict_path)
             targets.update(data_dict)
+
+            # if targets["trajectory"] is None:
+            #     print("targets['trajectory'] is None at this point in training_step")
+            # else:
+            #     print(f" trajectory tensor: {targets['trajectory'].shape}")
+
+
+        # # Fallback logic
+        # if targets.get("trajectory") is None:
+        #     print(f"trajectory is None for token: {token}")
+
+        #     # Try to get index and fallback to previous token
+        #     try:
+        #         current_index = self.tokens.index(token)
+        #         if current_index > 0:
+        #             prev_token = self.tokens[current_index - 1]
+        #             print(f"Falling back to previous token: {prev_token}")
+
+        #             prev_token_path = self._valid_cache_paths[prev_token]
+        #             for builder in self._target_builders:
+        #                 data_dict_path = prev_token_path / (builder.get_unique_name() + ".gz")
+        #                 prev_data_dict = load_feature_target_from_pickle(data_dict_path)
+        #                 if "trajectory" in prev_data_dict and prev_data_dict["trajectory"] is not None:
+        #                     targets["trajectory"] = prev_data_dict["trajectory"]
+        #                     print(f"Replaced with trajectory from {prev_token}")
+        #                     break
+
+        #     except Exception as e:
+        #         print(f"Fallback failed: {e}")
 
         return (features, targets)
 
@@ -277,6 +318,11 @@ class Dataset(torch.utils.data.Dataset):
             ), f"The token {token} has not been cached yet, please call cache_dataset first!"
 
             features, targets = self._load_scene_with_token(token)
+            if targets["trajectory"] is None:
+                print("targets['trajectory'] is None at this point in training_step")
+            else:
+                print(f"targets keys: {list(targets.keys())}")
+                print(f" trajectory tensor: {targets['trajectory'].shape}")
         else:
             scene = self._scene_loader.get_scene_from_token(self._scene_loader.tokens[idx])
             agent_input = scene.get_agent_input()
@@ -286,3 +332,28 @@ class Dataset(torch.utils.data.Dataset):
                 targets.update(builder.compute_targets(scene))
 
         return (features, targets)
+
+class CachedFallbackDataset(torch.utils.data.Dataset):
+    def __init__(self, base_dataset):
+        self.base_dataset = base_dataset
+        self.cached_targets = None
+
+    def __len__(self):
+        return len(self.base_dataset)
+
+    def __getitem__(self, idx):
+        features, targets = self.base_dataset[idx]
+
+        # If current targets are invalid, fallback
+        if targets is None or targets.get("trajectory") is None:
+            if self.cached_targets is not None:
+                print(f"Fallback triggered at idx={idx}")
+                return features, self.cached_targets
+            else:
+                raise RuntimeError(f"No cached targets available for fallback at idx={idx}")
+
+        # Update the cache and return
+        self.cached_targets = targets
+        return features, targets
+    
+    

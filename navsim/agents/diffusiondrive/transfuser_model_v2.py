@@ -102,7 +102,7 @@ class V2TransfuserModel(nn.Module):
         batch_size = status_feature.shape[0]
 
         bev_feature_upscale, bev_feature, _ = self._backbone(camera_feature, lidar_feature)
-        print(bev_feature.shape)
+        # print(bev_feature.shape)
         cross_bev_feature = bev_feature_upscale
         bev_spatial_shape = bev_feature_upscale.shape[2:]
         concat_cross_bev_shape = bev_feature.shape[2:]

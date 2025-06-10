@@ -128,6 +128,7 @@ class LossComputer(nn.Module):
         plan_anchor: (bs,20, 8, 2)
         targets['trajectory']: (bs, 8, 3)
         """
+
         bs, num_mode, ts, d = poses_reg.shape
         target_traj = targets["trajectory"]
         dist = torch.linalg.norm(target_traj.unsqueeze(1)[...,:2] - plan_anchor, dim=-1)

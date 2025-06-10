@@ -12,7 +12,7 @@ from navsim.agents.abstract_agent import AbstractAgent
 from navsim.common.dataclasses import SceneFilter
 from navsim.common.dataloader import SceneLoader
 from navsim.planning.training.agent_lightning_module import AgentLightningModule
-from navsim.planning.training.dataset import CacheOnlyDataset, Dataset
+from navsim.planning.training.dataset import CacheOnlyDataset, Dataset, CachedFallbackDataset
 
 logger = logging.getLogger(__name__)
 
@@ -74,6 +74,7 @@ def build_datasets(cfg: DictConfig, agent: AbstractAgent) -> Tuple[Dataset, Data
         force_cache_computation=cfg.force_cache_computation,
     )
 
+
     return train_data, val_data
 
 
@@ -120,6 +121,10 @@ def main(cfg: DictConfig) -> None:
     else:
         logger.info("Building SceneLoader")
         train_data, val_data = build_datasets(cfg, agent)
+
+    # Added callback to replace None
+    train_data = CachedFallbackDataset(train_data)
+    val_data = CachedFallbackDataset(val_data)
 
     logger.info("Building Datasets")
     train_dataloader = DataLoader(train_data, **cfg.dataloader.params, shuffle=True)

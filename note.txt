@@ -4,11 +4,11 @@ export NAVSIM_EXP_ROOT="/home/junn2004/Desktop/XianCheng/Diffusion_navsim_end_to
 export NAVSIM_DEVKIT_ROOT="/home/junn2004/Desktop/XianCheng/Diffusion_navsim_end_to_end/"
 export OPENSCENE_DATA_ROOT="/home/junn2004/Desktop/XianCheng/Diffusion_navsim_end_to_end/dataset"
 export PYTHONPATH="/home/junn2004/Desktop/XianCheng/Diffusion_navsim_end_to_end:$PYTHONPATH"
-
+export CKPT="/home/junn2004/Desktop/XianCheng/Diffusion_navsim_end_to_end/exp/ckpt/epoch-99-step-3900.ckpt"
 
 # Bug that meet during running
 1. target["trajectory"] is None
--> 
+-> agent lightnigh module need to add targets for loss calculation ["because it is a dict and only extract features resulting targets did not extract"]
 
 2. TypeError: stat: path should be string, bytes, os.PathLike or integer, not NoneType (during scene_loader)
 -> Restart the terminal and make sure the NUPLAN_MAPS_ROOT is predefined like this
@@ -19,3 +19,13 @@ os.environ["NUPLAN_MAPS_ROOT"] = "/home/claudane/Desktop/navsim/dataset/maps"
 os.environ["CACHEDATA"] = str("/home/claudane/Desktop/navsim/exp/training_cache")
 OPENSCENE_DATA_ROOT = os.environ.get("OPENSCENE_DATA_ROOT")
 NUPLAN_MAPS_ROOT = os.environ.get("NUPLAN_MAPS_ROOT")
+
+3.Run_PDM_SCORE_ONE_Stage (No objects to concatenate)
+"""
+if not all_updates:
+    print("No adjacent pairs found — returning original DataFrame.")
+    full_score_df.reset_index(inplace=True)
+    return full_score_df.drop(columns=["ego_simulated_states"])
+"""
+
+Added this line of code in run_pdm_score_one_stage.py to return the dataframe into original DataFrame

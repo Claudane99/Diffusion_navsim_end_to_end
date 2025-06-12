@@ -98,7 +98,7 @@ class TransfuserAgent(AbstractAgent):
 
     def get_target_builders(self) -> List[AbstractTargetBuilder]:
         """Inherited, see superclass."""
-        return [TransfuserTargetBuilder(config=self._config)]
+        return [TransfuserTargetBuilder(trajectory_sampling=self._trajectory_sampling, config=self._config)]
 
     def get_feature_builders(self) -> List[AbstractFeatureBuilder]:
         """Inherited, see superclass."""

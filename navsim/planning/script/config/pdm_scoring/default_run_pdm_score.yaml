@@ -13,7 +13,7 @@ defaults:
   - scorer: pdm_scorer
   - agent: constant_velocity_agent
   - _self_
-  - override train_test_split: navtest
+  - override train_test_split: mini
 
 simulator:
   _target_: navsim.planning.simulation.planner.pdm_planner.simulation.pdm_simulator.PDMSimulator

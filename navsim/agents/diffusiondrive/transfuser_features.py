@@ -14,6 +14,7 @@ from nuplan.common.maps.abstract_map import AbstractMap, SemanticMapLayer, MapOb
 from nuplan.common.actor_state.oriented_box import OrientedBox
 from nuplan.common.actor_state.state_representation import StateSE2
 from nuplan.common.actor_state.tracked_objects_types import TrackedObjectType
+from nuplan.planning.simulation.trajectory.trajectory_sampling import TrajectorySampling
 
 from navsim.agents.diffusiondrive.transfuser_config import TransfuserConfig
 from navsim.common.dataclasses import AgentInput, Scene, Annotations
@@ -121,11 +122,12 @@ class TransfuserFeatureBuilder(AbstractFeatureBuilder):
 class TransfuserTargetBuilder(AbstractTargetBuilder):
     """Output target builder for TransFuser."""
 
-    def __init__(self, config: TransfuserConfig):
+    def __init__(self, trajectory_sampling: TrajectorySampling, config: TransfuserConfig):
         """
         Initializes target builder.
         :param config: global config dataclass of TransFuser
         """
+        self._trajectory_sampling = trajectory_sampling
         self._config = config
 
     def get_unique_name(self) -> str:
@@ -135,40 +137,9 @@ class TransfuserTargetBuilder(AbstractTargetBuilder):
     def compute_targets(self, scene: Scene) -> Dict[str, torch.Tensor]:
         """Inherited, see superclass."""
 
-        try:
-            trajectory_data = scene.get_future_trajectory(
-                num_trajectory_frames=self._config.trajectory_sampling.num_poses
-            )
-            poses = trajectory_data.poses
-
-            if (
-                poses is None or
-                not isinstance(poses, list) or
-                any(p is None for p in poses)
-            ):
-                raise ValueError("Invalid trajectory poses")
-
-            trajectory = torch.tensor(poses, dtype=torch.float32)
-
-            if trajectory.shape != (self._config.trajectory_sampling.num_poses, 3):
-                raise ValueError(f"Unexpected trajectory shape: {trajectory.shape}")
-
-            if torch.isnan(trajectory).any():
-                raise ValueError("Trajectory contains NaN")
-
-            self._last_valid_trajectory = trajectory
-
-        except Exception as e:
-            if self._last_valid_trajectory is not None:
-                logging.warning(f"Fallback to last valid trajectory due to: {e}")
-                trajectory = self._last_valid_trajectory
-            else:
-                logging.error(f"No fallback trajectory available: {e}")
-                # Ensure a dummy tensor is returned
-                trajectory = torch.zeros(
-                    (self._config.trajectory_sampling.num_poses, 3), dtype=torch.float32
-                )
-
+        trajectory = torch.tensor(
+            scene.get_future_trajectory(num_trajectory_frames=self._trajectory_sampling.num_poses).poses
+        )
         frame_idx = scene.scene_metadata.num_history_frames - 1
         annotations = scene.frames[frame_idx].annotations
         ego_pose = StateSE2(*scene.frames[frame_idx].ego_status.ego_pose)

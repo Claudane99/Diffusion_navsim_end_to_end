@@ -122,9 +122,9 @@ def main(cfg: DictConfig) -> None:
         logger.info("Building SceneLoader")
         train_data, val_data = build_datasets(cfg, agent)
 
-    # Added callback to replace None
-    train_data = CachedFallbackDataset(train_data)
-    val_data = CachedFallbackDataset(val_data)
+    # # Added callback to replace None
+    # train_data = CachedFallbackDataset(train_data)
+    # val_data = CachedFallbackDataset(val_data)
 
     logger.info("Building Datasets")
     train_dataloader = DataLoader(train_data, **cfg.dataloader.params, shuffle=True)

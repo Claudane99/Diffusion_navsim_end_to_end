@@ -28,3 +28,4 @@ dataset
 # running scripts
 scripts_dev/*
 dataset/
+exp/

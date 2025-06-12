@@ -218,7 +218,13 @@ def create_scene_aggregators(
         updated_rows = aggregator.aggregate_scores(one_stage_only=True)
 
         all_updates.append(updated_rows)
-
+    
+    # Added this to return original dataset when the is not adjacent mapping
+    if not all_updates:
+        # print("No adjacent pairs found — returning original DataFrame.")
+        full_score_df.reset_index(inplace=True)
+        return full_score_df.drop(columns=["ego_simulated_states"])
+    
     all_updates_df = pd.concat(all_updates, ignore_index=True).set_index("token")
     full_score_df.update(all_updates_df)
     full_score_df.reset_index(inplace=True)
@@ -266,8 +272,15 @@ def main(cfg: DictConfig) -> None:
     score_rows: List[pd.DataFrame] = worker_map(worker, run_pdm_score, data_points)
 
     pdm_score_df = pd.concat(score_rows)
+    # invalid = pdm_score_df[~pdm_score_df['valid']]
+    # logger.info(f"Invalid rows count: {len(invalid)}")
+    # logger.info(f"Invalid tokens:\n{invalid['token'].tolist()}")
+    # pdm_score_df.to_csv("pdm_score_results_debug.csv", index=False)
+    # logger.info("Saved pdm_score_df to pdm_score_results.csv")
 
     start_adjacent_mapping = infer_start_adjacent_mapping(pdm_score_df)
+    # logger.info(f"Start-adjacent mapping keys: {list(start_adjacent_mapping.keys())}")
+
     pdm_score_df = create_scene_aggregators(
         start_adjacent_mapping, pdm_score_df, instantiate(cfg.simulator.proposal_sampling)
     )
